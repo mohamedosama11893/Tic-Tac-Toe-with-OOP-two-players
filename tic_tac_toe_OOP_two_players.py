@@ -86,3 +86,52 @@ class Menu:
             except ValueError:
                 pass
             choose = input("Invalid. Enter your choice (1 or 2): ")
+            
+class Board:
+    """Represents the 3x3 board and provides helper methods."""
+
+    def __init__(self):
+        # Board cells are strings "1".."9" initially
+        self.board = [str(i) for i in range(1, 10)]
+
+    def display_board(self):
+        """Print the current board to the console in a 3x3 layout."""
+        for i in range(0, 9, 3):
+            print('|'.join(self.board[i:i + 3]))
+            if i < 6:
+                print('-' * 5)
+
+    def update_board(self, choice, symbol):
+        """
+        Attempt to place `symbol` into cell `choice` (1-9).
+        Returns True if the move was valid and applied, otherwise False.
+        """
+        if self.valid_move(choice):
+            self.board[choice - 1] = symbol
+            return True
+        return False
+
+    def reset_board(self):
+        """Reset the board back to the initial numeric state."""
+        self.board = [str(i) for i in range(1, 10)]
+
+    def valid_move(self, choice):
+        """
+        Return True if the requested cell is still numeric (not occupied).
+        This is used to detect empty cells (available moves).
+        """
+        return self.board[choice - 1].isnumeric()
+
+    def display_winner_combo(self, combo):
+        """
+        Display only the winning combo on a 3x3 layout.
+        Other cells are shown as spaces for emphasis.
+        'combo' contains indices 0..8 that made the winning line.
+        """
+        temp = [' '] * 9
+        for i in combo:
+            temp[i] = self.board[i]
+        for i in range(0, 9, 3):
+            print('|'.join(temp[i:i + 3]))
+            if i < 6:
+                print('-' * 5)
