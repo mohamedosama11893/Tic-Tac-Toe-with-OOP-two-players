@@ -19,3 +19,34 @@ import random
 def clear_screen():
     """Clear the terminal screen cross-platform."""
     os.system("cls" if os.name == "nt" else "clear")
+
+class Player:
+    """Represents a human player with a name and a single-letter symbol."""
+
+    def __init__(self):
+        self.name = ""
+        self.symbol = ""
+
+    def choose_name(self):
+        """Prompt the user to enter a name containing letters only."""
+        while True:
+            name = input("Enter your name (letters only): ")
+            if name.isalpha():
+                self.name = name
+                break
+            print("Invalid name. Please use letters only")
+
+    def choose_symbol(self, same_symbol=None):
+        """
+        Prompt the user to choose a single alphabetic symbol.
+        If same_symbol is provided, prevent choosing that symbol.
+        """
+        while True:
+            symbol = input("Enter your symbol (single letter): ")
+            if symbol.isalpha() and len(symbol) == 1:
+                if same_symbol and symbol.upper() == same_symbol.upper():
+                    print(f"Symbol '{symbol}' already taken by the other player. Choose another.")
+                    continue
+                self.symbol = symbol.upper()
+                break
+            print("Invalid symbol. Enter only alphabetic single character")
