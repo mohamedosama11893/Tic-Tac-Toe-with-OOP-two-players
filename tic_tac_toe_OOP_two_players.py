@@ -135,3 +135,127 @@ class Board:
             print('|'.join(temp[i:i + 3]))
             if i < 6:
                 print('-' * 5)
+                
+class Game:
+    """Main game controller handling player setup, turn flow and game state."""
+
+    def __init__(self):
+        self.players = [Player(), Player()]
+        self.board = Board()
+        self.menu = Menu()
+        self.current_player_index = 0
+
+    def start_game(self):
+        """Entry point: show main menu and start or quit based on selection."""
+        choice = self.menu.display_main_menu()
+        if choice == 1:
+            self.players_setup()
+            self.play_game()
+        else:
+            self.quit_game()
+
+    def players_setup(self):
+        """Prompt both players to enter names and pick symbols (prevent duplicate symbols)."""
+        clear_screen()
+        for index, player in enumerate(self.players, 1):
+            print(f"Player {index}, Enter your details:")
+            player.choose_name()
+            same = self.players[0].symbol if index == 2 else None
+            player.choose_symbol(same_symbol=same)
+            clear_screen()
+
+    def play_game(self):
+        """Main game loop: run turns until win or draw, then show endgame menu."""
+        clear_screen()
+        self.start_turn()
+        while True:
+            self.play_turn()
+            winning_combo = self.check_win()
+            if winning_combo:
+                clear_screen()
+                self.board.display_board()
+                print("\n")
+                self.board.display_winner_combo(winning_combo)
+                # The winner is the other player because switch_player() flips index after a successful move
+                player = self.players[1 - self.current_player_index]
+                print(f"\n{player.name} won")
+                choice = self.menu.display_endgame_menu()
+                if choice == 1:
+                    self.restart_game()
+                else:
+                    self.quit_game()
+                break
+            elif self.check_draw():
+                clear_screen()
+                self.board.display_board()
+                print("\nIt's Draw")
+                choice = self.menu.display_endgame_menu()
+                if choice == 1:
+                    self.restart_game()
+                else:
+                    self.quit_game()
+                break
+
+    def start_turn(self):
+        """Randomly choose which player starts the game."""
+        self.current_player_index = random.randint(0, 1)
+
+    def play_turn(self):
+        """
+        Execute one player's turn:
+        - display board and prompt for a cell (1-9)
+        - validate the input and apply the move
+        - then switch player index
+        """
+        clear_screen()
+        player = self.players[self.current_player_index]
+        self.board.display_board()
+        print(f"\nIt's {player.name}'s turn. Your symbol: {player.symbol}\n")
+        while True:
+            try:
+                cell_choice = int(input("Choose a cell (1-9): "))
+                if 1 <= cell_choice <= 9 and self.board.update_board(cell_choice, player.symbol):
+                    break
+                else:
+                    print("Invalid move, Try again!")
+            except ValueError:
+                print("Please enter a number between 1 and 9")
+        self.switch_player()
+
+    def switch_player(self):
+        """
+        Toggle the current player index.
+        The existing condition preserves original behavior:
+        if not self.check_win() or not self.check_draw(): flip index.
+        """
+        if not self.check_win() or not self.check_draw():
+            self.current_player_index = 1 - self.current_player_index
+
+    def check_win(self):
+        """
+        Check the board for a winning combination.
+        Returns the winning combo (list of 3 indices) if found, otherwise None.
+        """
+        win_combination = [
+            [0, 1, 2], [0, 3, 6], [0, 4, 8],
+            [1, 4, 7], [2, 4, 6], [2, 5, 8],
+            [3, 4, 5], [6, 7, 8]
+        ]
+        for combo in win_combination:
+            if (self.board.board[combo[0]] == self.board.board[combo[1]] ==
+                    self.board.board[combo[2]] and not self.board.board[combo[0]].isnumeric()):
+                return combo
+        return None
+
+    def check_draw(self):
+        """Return True when all board cells are non-digit (i.e., all occupied)."""
+        return all(not cell.isdigit() for cell in self.board.board)
+
+    def restart_game(self):
+        """Reset the board and immediately start a new game loop."""
+        self.board.reset_board()
+        self.play_game()
+
+    def quit_game(self):
+        """Show a simple goodbye message and exit the game flow."""
+        print("Thank you for playing!")
