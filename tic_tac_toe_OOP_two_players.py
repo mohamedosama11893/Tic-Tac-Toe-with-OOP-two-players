@@ -15,3 +15,7 @@ import random
 #      - on win or draw show result and ask whether to restart or quit
 # 4) Board operations include: display, update cell, reset, validate moves, and show winning line.
 # ================================================================
+
+def clear_screen():
+    """Clear the terminal screen cross-platform."""
+    os.system("cls" if os.name == "nt" else "clear")
