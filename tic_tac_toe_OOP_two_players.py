@@ -50,3 +50,39 @@ class Player:
                 self.symbol = symbol.upper()
                 break
             print("Invalid symbol. Enter only alphabetic single character")
+            
+class Menu:
+    """Simple menu class to display main and endgame options and validate choice."""
+
+    def display_main_menu(self):
+        """Show the main menu and return the validated choice (1 or 2)."""
+        clear_screen()
+        print("Welcome to X O Game!")
+        print("1. Start Game")
+        print("2. Quit Game")
+        validate = input("Enter your choice (1 or 2): ")
+        return self.validate_choice(validate)
+
+    def display_endgame_menu(self):
+        """Show end-of-game options and return the validated choice (1 or 2)."""
+        menu_text = """
+        Game Over!
+        1. Start Game
+        2. Quit Game
+        """
+        validate = input(menu_text + "\nEnter your choice (1 or 2): ")
+        return self.validate_choice(validate)
+
+    def validate_choice(self, choose):
+        """
+        Validate that 'choose' is either 1 or 2.
+        Re-prompt until a valid integer choice is provided.
+        """
+        while True:
+            try:
+                choose = int(choose)
+                if choose in (1, 2):
+                    return choose
+            except ValueError:
+                pass
+            choose = input("Invalid. Enter your choice (1 or 2): ")
