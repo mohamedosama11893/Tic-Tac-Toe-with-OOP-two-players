@@ -259,3 +259,7 @@ class Game:
     def quit_game(self):
         """Show a simple goodbye message and exit the game flow."""
         print("Thank you for playing!")
+        
+if __name__ == "__main__":
+    game = Game()
+    game.start_game()
